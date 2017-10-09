@@ -51,8 +51,14 @@ router.get('/', function (req, res) {
   res.redirect('/checkouts/new');
 });
 
-router.get("/client_token", function (req, res) {
-  gateway.clientToken.generate({}, function (err, response) {
+router.post("/client_token", function (req, res) {
+  var params = {}
+  if (req.body.customerId) {
+    params = {
+      customerId: req.body.customerId
+    }
+  }
+  gateway.clientToken.generate(params, function (err, response) {
     res.send(response.clientToken);
   });
 });
@@ -78,21 +84,34 @@ router.post('/checkouts', function (req, res) {
   var numberOfPacks = req.body.number_of_packs; // In production you should not take amounts directly from clients
   var nonce = req.body.payment_method_nonce;
   var amount = numberOfPacks * 8
-  console.log(amount)
 
   gateway.transaction.sale({
     amount: amount,
     paymentMethodNonce: nonce,
     options: {
-      submitForSettlement: true
+      submitForSettlement: true,
+      storeInVaultOnSuccess: true
     }
   }, function (err, result) {
     if (result.success || result.transaction) {
-      res.redirect('checkouts/' + result.transaction.id);
+      res.sendStatus(200);
     } else {
       transactionErrors = result.errors.deepErrors();
-      req.flash('error', {msg: formatErrors(transactionErrors)});
-      res.redirect('checkouts/new');
+      res.send({ error: transactionErrors})
+    }
+  });
+});
+
+router.post('/customer/new', function (req, res) {
+  var nonce = req.body.payment_method_nonce
+  gateway.customer.create({
+    paymentMethodNonce: nonce
+  }, function (err, result) {
+    if (result.success) {
+      res.send(result.customer.id)
+    } else {
+      console.log(err)
+      res.send({error: err})
     }
   });
 });
