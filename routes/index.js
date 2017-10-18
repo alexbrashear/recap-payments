@@ -91,7 +91,8 @@ router.post('/checkouts', function (req, res) {
     options: {
       submitForSettlement: true,
       storeInVaultOnSuccess: true
-    }
+    },
+    deviceData: req.body.device_data
   }, function (err, result) {
     if (result.success || result.transaction) {
       res.sendStatus(200);
