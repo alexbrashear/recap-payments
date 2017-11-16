@@ -95,7 +95,7 @@ router.post('/checkouts', function (req, res) {
     deviceData: req.body.device_data
   }, function (err, result) {
     if (result.success || result.transaction) {
-      res.sendStatus(200);
+      res.send({ result: result});
     } else {
       transactionErrors = result.errors.deepErrors();
       res.send({ error: transactionErrors})
