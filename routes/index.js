@@ -81,7 +81,7 @@ router.get('/checkouts/:id', function (req, res) {
 
 router.post('/checkouts', function (req, res) {
   var transactionErrors;
-  var numberOfPacks = req.body.number_of_packs; // In production you should not take amounts directly from clients
+  var numberOfPacks = req.body.number_of_packs;
   var nonce = req.body.payment_method_nonce;
   var amount = numberOfPacks * 8
 
