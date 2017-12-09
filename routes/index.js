@@ -117,4 +117,19 @@ router.post('/customer/new', function (req, res) {
   });
 });
 
+router.post('/customer/new-v2', function (req, res) {
+  gateway.customer.create({
+    firstName: req.body.firstName,
+    lastName: req.body.lastName,
+    email: req.body.email
+  }, function (err, result) {
+    if (result.success) {
+      res.send({result: result.customer.id})
+    } else {
+      console.log(err)
+      res.send({error: err})
+    }
+  });
+});
+
 module.exports = router;
